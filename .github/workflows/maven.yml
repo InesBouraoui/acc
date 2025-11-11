@@ -20,33 +20,22 @@ jobs:
           distribution: temurin
           java-version: 17
 
-      - name: Set up Node.js 18
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18
-
       # ---------- CI Steps ----------
-      - name: Build Angular App
-        run: |
-          echo "=== Building Angular App ==="
-          # ng build --prod (demo: just print)
-          echo "Angular build done!"
-
       - name: Build Spring Boot App
         run: |
           echo "=== Building Spring Boot App ==="
-          # ./mvnw clean package (demo: just print)
+          sleep 10  # simulate build time
           echo "Spring Boot build done!"
 
       - name: Run Tests
         run: |
           echo "=== Running Tests ==="
-          # ./mvnw test (demo: just print)
+          sleep 5   # simulate test execution
           echo "Tests passed!"
 
       # ---------- CD Steps ----------
-      - name: Deploy Stage
+      - name: Deploy to Stage
         run: |
           echo "=== Deploying to Stage Environment ==="
-          # demo: just print
+          sleep 8   # simulate deployment time
           echo "Deployment done!"
