@@ -1,0 +1,52 @@
+name: Demo CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  demo-pipeline:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Set up Node.js 18
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      # ---------- CI Steps ----------
+      - name: Build Angular App
+        run: |
+          echo "=== Building Angular App ==="
+          # ng build --prod (demo: just print)
+          echo "Angular build done!"
+
+      - name: Build Spring Boot App
+        run: |
+          echo "=== Building Spring Boot App ==="
+          # ./mvnw clean package (demo: just print)
+          echo "Spring Boot build done!"
+
+      - name: Run Tests
+        run: |
+          echo "=== Running Tests ==="
+          # ./mvnw test (demo: just print)
+          echo "Tests passed!"
+
+      # ---------- CD Steps ----------
+      - name: Deploy Stage
+        run: |
+          echo "=== Deploying to Stage Environment ==="
+          # demo: just print
+          echo "Deployment done!"
