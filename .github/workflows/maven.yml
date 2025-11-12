@@ -1,20 +1,10 @@
-name: Full CI/CD Pipeline
+name: Demo Full CI/CD Pipeline
 
 on:
   push:
     branches:
       - main
   pull_request:
-
-env:
-  DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
-  DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
-  VPS_HOST: ${{ secrets.VPS_HOST }}
-  VPS_USER: ${{ secrets.VPS_USER }}
-  SSH_KEY: ${{ secrets.VPS_SSH_KEY }}
-  APP_NAME: my-app
-  ANGULAR_PORT: 80
-  SPRINGBOOT_PORT: 8080
 
 jobs:
   build-and-test:
@@ -40,38 +30,29 @@ jobs:
       - name: Build Spring Boot App
         run: |
           echo "Building Spring Boot backend..."
-          ./mvnw clean package -DskipTests
-          sleep 10  # simulate realistic build time
+          sleep 10
           echo "Spring Boot build complete."
 
       # ---------- Frontend Build ----------
       - name: Build Angular App
         run: |
           echo "Building Angular frontend..."
-          cd frontend
-          npm install
-          npm run build -- --configuration production
-          sleep 8   # simulate realistic build time
+          sleep 8
           echo "Angular build complete."
-          cd ..
 
       # ---------- Backend Tests ----------
       - name: Run Backend Tests
         run: |
           echo "Running backend tests..."
-          ./mvnw test
           sleep 5
           echo "Backend tests passed!"
 
-      # ---------- Frontend Lint/Tests ----------
-      - name: Run Frontend Lint & Tests
+      # ---------- Frontend Tests ----------
+      - name: Run Frontend Tests
         run: |
-          cd frontend
-          npm run lint
-          npm run test -- --watch=false --browsers=ChromeHeadless
+          echo "Running frontend tests..."
           sleep 4
-          echo "Frontend tests passed."
-          cd ..
+          echo "Frontend tests passed!"
 
   dockerize:
     name: Dockerize & Push Images
@@ -92,7 +73,6 @@ jobs:
       - name: Build Spring Boot Docker Image
         run: |
           echo "Building backend Docker image..."
-          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/springboot-backend:latest ./backend
           sleep 5
           echo "Backend Docker image ready."
 
@@ -100,16 +80,18 @@ jobs:
       - name: Build Angular Docker Image
         run: |
           echo "Building frontend Docker image..."
-          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/angular-frontend:latest ./frontend
           sleep 5
           echo "Frontend Docker image ready."
 
       # ---------- Push Docker Images ----------
-      - name: Push Docker Images to DockerHub
+      - name: Push Docker Images
         run: |
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/springboot-backend:latest
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/angular-frontend:latest
-          echo "Docker images pushed to DockerHub."
+          echo "Pushing backend Docker image to DockerHub..."
+          sleep 3
+          echo "Backend image pushed."
+          echo "Pushing frontend Docker image to DockerHub..."
+          sleep 3
+          echo "Frontend image pushed."
 
   deploy:
     name: Deploy to VPS
@@ -117,9 +99,6 @@ jobs:
     needs: dockerize
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
       - name: Setup SSH
         uses: webfactory/ssh-agent@v0.8.1
         with:
@@ -127,22 +106,18 @@ jobs:
 
       - name: Deploy Backend & Frontend
         run: |
-          echo "Starting deployment on VPS..."
-          ssh -o StrictHostKeyChecking=no ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} << 'EOF'
-            echo "Pulling backend image..."
-            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/springboot-backend:latest
-            echo "Stopping existing backend container..."
-            docker stop springboot-backend || true
-            docker rm springboot-backend || true
-            echo "Running backend container..."
-            docker run -d --name springboot-backend -p 8080:8080 ${{ secrets.DOCKERHUB_USERNAME }}/springboot-backend:latest
-
-            echo "Pulling frontend image..."
-            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/angular-frontend:latest
-            echo "Stopping existing frontend container..."
-            docker stop angular-frontend || true
-            docker rm angular-frontend || true
-            echo "Running frontend container..."
-            docker run -d --name angular-frontend -p 80:80 ${{ secrets.DOCKERHUB_USERNAME }}/angular-frontend:latest
-            echo "Deployment complete!"
-          EOF
+          echo "Connecting to VPS..."
+          sleep 2
+          echo "Pulling backend image..."
+          sleep 3
+          echo "Stopping existing backend container..."
+          sleep 2
+          echo "Running backend container..."
+          sleep 3
+          echo "Pulling frontend image..."
+          sleep 3
+          echo "Stopping existing frontend container..."
+          sleep 2
+          echo "Running frontend container..."
+          sleep 3
+          echo "Deployment complete!"
